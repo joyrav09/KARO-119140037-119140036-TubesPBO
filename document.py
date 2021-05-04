@@ -10,7 +10,7 @@ class document():
         self.root.resizable(False, False)
 
         # set tombol Keluar
-        self.imgKeluar = PhotoImage(file='png\logout.png')
+        self.imgKeluar = PhotoImage(file='logout.png')
         self.btnKeluar = Button(image=self.imgKeluar, compound='top', command=self.Keluar)
         self.btnKeluar.place(x=970, y=12.5, height=30)
 
