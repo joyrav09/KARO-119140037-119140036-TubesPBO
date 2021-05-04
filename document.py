@@ -1,41 +1,52 @@
 from tkinter import *
 from tkinter import ttk
+import tkinter.messagebox as mb
 
 class document():
     def __init__(self,root):
         self.root = root
         self.root.title("Document Management System")
-        self.root.geometry("720x540")
+        self.root.geometry("1020x540")
         self.root.resizable(False, False)
+
+        # set tombol Keluar
+        self.imgKeluar = PhotoImage(file='png\logout.png')
+        self.btnKeluar = Button(image=self.imgKeluar, compound='top', command=self.Keluar)
+        self.btnKeluar.place(x=970, y=12.5, height=30)
+
+        table1 = Frame(self.root, bd=4, relief=RIDGE, bg="white")
+        table1.place(y=50, width=290, height=450)
+
+        table2 = Frame(self.root, bd=4, relief=RIDGE, bg="white")
+        table2.place(y=50, x=300, width=719, height=450)
         
-        table = Frame(self.root, bd=4, relief=RIDGE, bg="white")
-        table.place( y=50, width=719, height=400)
         
-        
-        search = Entry(bd=7, relief=GROOVE)
-        search.grid(row=0, column=2, padx=10,pady=10)
+        search = Entry(bd=3, relief=GROOVE, width=30)
+        search.place(x=700,y=14, height=27)
 
         searchbtn = Button(text="search")
-        searchbtn.grid(row=0, column=3, padx=10,pady=10)
+        searchbtn.place(x=900,y=15)
 
-        scroll_y= Scrollbar(table, orient=VERTICAL)
-        document_table = ttk.Treeview(table, column=("No", "NIM", "Nama", "Prodi"),xscrollcommand=scroll_y.set)
+        scroll_y= Scrollbar(table2, orient=VERTICAL)
+        document_table = ttk.Treeview(table2, column=("Nama", "Tanggal Upload", "File"), xscrollcommand=scroll_y.set)
         scroll_y.pack(side=RIGHT, fill=Y)
         scroll_y.config(command=document_table)
 
-        document_table.heading("No", text="No")
-        document_table.heading("NIM", text="NIM")
         document_table.heading("Nama", text="Nama")
-        document_table.heading("Prodi", text="Prodi")
+        document_table.heading("Tanggal Upload", text="Tanggal Upload")
+        document_table.heading("File", text="File")
         document_table["show"]="headings"
         document_table.pack()
-        document_table.column("No", width=50)
-        document_table.column("NIM", width=190)
-        document_table.column("Nama", width=230)
-        document_table.column("Prodi", width=220)
+
         document_table.pack(fill=BOTH, expand=1)
 
+    def Keluar(self, event=None):
+        if mb.askyesno('Konfirmasi', 'Keluar dari program?', parent=self.root):
+            self.root.destroy()
 
-root = Tk()
-apk = document(root)
-root.mainloop()
+
+if __name__ == '__main__':
+    root = Tk()
+    root.configure(background="#3cc7f7")
+    apk = document(root)
+    root.mainloop()
