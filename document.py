@@ -54,6 +54,9 @@ class document(ttk.Frame):
         self.var_name = StringVar()
         self.var_nim = StringVar()
         self.var_prodi = StringVar()
+        self.var_umur = StringVar() 
+        self.var_agama = StringVar()
+        self.var_nohp = StringVar()
 
         self.var_search = StringVar()
 
@@ -96,6 +99,12 @@ class document(ttk.Frame):
         label_nim.grid(row=2,column=0, pady=10, padx=10, sticky="w")
         label_prodi = Label(table1, text="Prodi", bg="#D9D9D9", font=("cambria", 12))
         label_prodi.grid(row=3,column=0, pady=10, padx=10, sticky="w")
+        label_umur = Label(table1, text="Umur",bg="green",font=("cambria", 12))
+        label_umur.grid(row=4,colum=0,pady=10, padx=10, sticky="w")
+        label_agama = Label(table1, text="Agama",bg="green",font=("cambria", 12))
+        label_agama.grid(row=5,colum=0,pady=10, padx=10, sticky="w")
+        label_nohp= Label(table1, text="NOHP",bg="green",font=("cambria", 12))
+        label_nohp.grid(row=6,colum=0,pady=10, padx=10, sticky="w")
 
         self.entry_name = Entry(table1,textvariable=self.var_name, bd=3, relief=GROOVE, width=30)
         self.entry_name.grid(row=1, column=1, pady=10, padx=10, sticky="w")
@@ -103,6 +112,12 @@ class document(ttk.Frame):
         self.entry_nim.grid(row=2, column=1, pady=10, padx=10, sticky="w")
         self.entry_prodi = Entry(table1,textvariable=self.var_prodi, bd=3, relief=GROOVE, width=30)
         self.entry_prodi.grid(row=3, column=1, pady=10, padx=10, sticky="w")
+        self.entry_umur = Entry(table1,textvariable=self.var_prodi, bd=3, relief=GROOVE, width=30)
+        self.entry_umur.grid(row=4, column=1, pady=10, padx=10, sticky="w")
+        self.entry_agama = Entry(table1,textvariable=self.var_prodi, bd=3, relief=GROOVE, width=30)
+        self.entry_agama.grid(row=5, column=1, pady=10, padx=10, sticky="w")
+        self.entry_nohp = Entry(table1,textvariable=self.var_prodi, bd=3, relief=GROOVE, width=30)
+        self.entry_nohp.grid(row=6, column=1, pady=10, padx=10, sticky="w")
 
         self.label = Label(table1, text = "", bg="#D9D9D9")
         self.label.place(x =10, y=300) 
@@ -115,7 +130,7 @@ class document(ttk.Frame):
         #SCROLL
         scroll_x= Scrollbar(table2, orient=HORIZONTAL)
         scroll_y= Scrollbar(table2, orient=VERTICAL)  
-        self.document_table = ttk.Treeview(table2, column=("Nama", "NIM", "Prodi", "File"), xscrollcommand=scroll_x.set)
+        self.document_table = ttk.Treeview(table2, column=("Nama", "NIM", "Prodi", "Umur", "Agama", "NOHP", "File"), xscrollcommand=scroll_x.set)
         scroll_x.pack(side=BOTTOM, fill=X)
         scroll_y.pack(side=RIGHT, fill=Y)    
         scroll_y.config(command=self.document_table.yview)
@@ -141,11 +156,17 @@ class document(ttk.Frame):
         self.document_table.heading("Nama", text="Nama")
         self.document_table.heading("NIM", text="NIM")
         self.document_table.heading("Prodi", text="Prodi")
+        self.document_table.heading("Umur", text="Umur")
+        self.document_table.heading("Agama", text="Agama")
+        self.document_table.heading("NO HP", text="NO HP")
         self.document_table.heading("File", text="File")
         self.document_table["show"]="headings"
         self.document_table.column("Nama", width=100)
         self.document_table.column("NIM", width=100)
         self.document_table.column("Prodi", width=100)
+        self.document_table.column("Umur", width=100)
+        self.document_table.column("Agama", width=100)
+        self.document_table.column("NOHP", width=100) 
         self.document_table.column("File", width=100)
         self.document_table.pack(fill=BOTH, expand=1)
         self.document_table.bind("<ButtonRelease-1>", self.get_cursor)
@@ -163,11 +184,11 @@ class proses_data():
         return binaryData, string_path[1]
 
 
-    def insertBLOB(self, nama, nim, prodi, digitalFile=None):
+    def insertBLOB(self, nama, nim, prodi, umur, agama, nohp, digitalFile=None):
         print("Inserting BLOB into document table")
         con, cur = self.connect_start()
         sql_insert_blob_query = """ INSERT INTO document
-        (nama, nim, prodi, filename, file) VALUES (%s,%s,%s,%s,%s)"""
+        (nama, nim, prodi, umur, agama, nohp, filename, file) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,)"""
         print(digitalFile)
         if digitalFile != None :
             binaryFile, string_path = self.convertToBinaryData(digitalFile)
@@ -175,7 +196,7 @@ class proses_data():
             binaryFile=""
             string_path=""
 
-        insert_blob_tuple = (nama, nim, prodi, string_path, binaryFile)
+        insert_blob_tuple = (nama, nim, prodi, umur, agama, nohp, string_path, binaryFile)
         result = cur.execute(sql_insert_blob_query, insert_blob_tuple)
         print("File inserted successfully as a BLOB into document table", result)
         self.connect_end(con,cur)
@@ -197,15 +218,18 @@ class proses_data():
         for row in record:
             print("nama = ", row[0], )
             print("nim = ", row[1], )
-            print("prodi = ", row[2])
-            file = row[4]
+            print("prodi = ", row[2] )
+            print("umur = ", row[3], )
+            print("agama = ", row[4], )
+            print("nohp = ", row[5], )
+            file = row[6]
             print("Storing file mahasiswa on disk \n")
             self.write_file(file, digitalFile)
         self.connect_end(con,cur)
         print("MySQL connection is closed")
 
 
-    def prosesedit(self, nama, nim, prodi, digitalFile):
+    def prosesedit(self, nama, nim, prodi, umur, agama, nohp, digitalFile):
         con, cur = self.connect_start()
         if (digitalFile == ""):
             sql_check_query = """SELECT * from document where nim = %s"""
@@ -214,18 +238,21 @@ class proses_data():
             for row in record:
                 check_nama = row[0]
                 check_prodi = row[2]
-            if (check_nama == nama and check_prodi == prodi):
+                check_umur = row[3]
+                check_agama = agama[4]
+                check_nohp = nohp[5]
+            if (check_nama == nama and check_prodi == prodi or check_umur == umur and check_nohp == nohp and check_agama == agama ):
                 print("No Updated")
             else :
-                sql_update_query = """UPDATE document set nama = %s, prodi = %s where nim = %s"""
-                input_data = (nama, prodi, nim)
+                sql_update_query = """UPDATE document set nama = %s, prodi = %s,umur = %s, agama = %s, nohp = %s, where nim = %s"""
+                input_data = (nama, prodi,umur, agama, nohp, nim)
                 cur.execute(sql_update_query, input_data)
                 print("Record NIM =",(nim),"Updated successfully")
 
         else :
-            sql_update_query = """UPDATE document set nama = %s, prodi = %s, filename = %s, file = %s where nim = %s"""
+            sql_update_query = """UPDATE document set nama = %s, prodi = %s, umur = %s, agama = %s, nohp = %s, filename = %s, file = %s where nim = %s"""
             binaryFile, string_path = self.convertToBinaryData(digitalFile)
-            input_data = (nama, prodi, string_path, binaryFile, nim)
+            input_data = (nama, prodi,umur, agama, nohp, string_path, binaryFile, nim)
             cur.execute(sql_update_query, input_data)
             print("Record NIM =",(nim),"Updated successfully")
         self.connect_end(con,cur)
@@ -248,7 +275,7 @@ class program(document, proses_data):
     
 
     def add_document(self):
-        self.insertBLOB (self.var_name.get(),self.var_nim.get(),self.var_prodi.get(),self.filepath)
+        self.insertBLOB (self.var_name.get(),self.var_nim.get(),self.var_prodi.get(),self.var_umur.get(),self.var_agama.get(),self.var_nohp.get(),self.filepath)
 
 
     def download(self):
@@ -270,7 +297,7 @@ class program(document, proses_data):
 
 
     def edit_data(self):
-        self.prosesedit (self.var_name.get(),self.var_nim.get(),self.var_prodi.get(),self.filepath)
+        self.prosesedit (self.var_name.get(),self.var_nim.get(),self.var_prodi.get(),self.var_umur.get(),self.var_agama.get(),self.var_nohp.get(),self.filepath)
 
 
     def delete_data(self):
@@ -315,6 +342,9 @@ class program(document, proses_data):
         self.var_name.set(""),
         self.var_nim.set(""),
         self.var_prodi.set(""),
+        self.var_umur.set(""),
+        self.var_agama.set(""),
+        self.var_nohp.set(""),
         self.label.configure(text = "", bg="#D9D9D9")
         self.entry_nim.config(state="normal")
         self.filepath=""
@@ -328,6 +358,9 @@ class program(document, proses_data):
         self.entry_nim.config(state="disabled")
         self.var_nim.set(row[1])
         self.var_prodi.set(row[2])
+        self.var_umur.set(row[3])
+        self.var_agama.set(row[4])
+        self.var_nohp.set(row[5])
         
 
     def connect_start(self):
